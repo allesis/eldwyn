@@ -1,4 +1,7 @@
-use crate::{dfa::DFA, error::Error};
+use crate::{
+    dfa::{DFA, Pattern},
+    error::Error,
+};
 
 mod dfa;
 mod error;
@@ -8,7 +11,7 @@ pub struct Regex {
 }
 
 impl Regex {
-    pub fn new(pattern: &mut str) -> Result<Self, Error> {
+    pub fn new(pattern: &Pattern) -> Result<Self, Error> {
         match DFA::new(pattern) {
             Ok(dfa) => Ok(Self { dfa }),
             Err(err) => Err(err),
