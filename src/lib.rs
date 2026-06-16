@@ -1,14 +1,21 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
+use crate::{dfa::DFA, error::Error};
+
+mod dfa;
+mod error;
+
+pub struct Regex {
+    dfa: DFA,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl Regex {
+    pub fn new(pattern: &mut str) -> Result<Self, Error> {
+        match DFA::new(pattern) {
+            Ok(dfa) => Ok(Self { dfa }),
+            Err(err) => Err(err),
+        }
+    }
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+    pub fn run(&self, s: &str) -> bool {
+        self.dfa.run(s)
     }
 }
