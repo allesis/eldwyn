@@ -1,34 +1,59 @@
 mod action;
-mod state;
 
 pub(crate) type Pattern = Vec<u8>;
-use crate::{dfa::state::State, error::Error};
+use std::rc::Rc;
+
+use crate::{dfa::action::Action, error::Error};
 
 pub struct DFA {
-    states: Vec<State>,
+    start: State,
 }
 
 impl DFA {
     #[allow(unused)]
     pub(crate) fn new(pattern: &Pattern) -> Result<Self, Error> {
-        let mut p = pattern.clone();
-        let mut pattern_iter = p.iter_mut();
-        let states = vec![];
+        let start = pattern
+            .iter()
+            .rev()
+            .fold(State::new(Action::Accept, None), |state, symbol| {
+                State::new(
+                    Action::MatchSymbol { symbol: *symbol },
+                    Some(Rc::new(state)),
+                )
+            });
 
-        loop {
-            let c = pattern_iter.next();
-            match c {
-                Some(c) => print!("{}", char::from_u32(*c as u32).unwrap_or('?')),
-                None => break,
-            }
-        }
-        println!("");
-
-        Ok(Self { states })
+        Ok(Self { start })
     }
 
     #[allow(unused)]
     pub(crate) fn run(&self, input: &str) -> bool {
-        todo!()
+        self.start.run(input)
+    }
+}
+
+pub(crate) struct State {
+    pub(crate) action: Action,
+    pub(crate) next: Option<Rc<State>>,
+}
+
+impl State {
+    pub(crate) fn new(action: Action, next: Option<Rc<State>>) -> Self {
+        Self { action, next }
+    }
+
+    pub(crate) fn run(&self, input: &str) -> bool {
+        match self.action {
+            Action::Accept => input.len() == 0,
+            Action::MatchSymbol { symbol } => {
+                if input.starts_with(char::from(symbol)) && self.next.is_some() {
+                    self.next
+                        .clone()
+                        .unwrap_or_else(|| unreachable!("This is `Some`, it cannot be `None`..."))
+                        .run(input.get(1..).unwrap_or(""))
+                } else {
+                    false
+                }
+            }
+        }
     }
 }
