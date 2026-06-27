@@ -16,10 +16,7 @@ impl Dfa {
             .iter()
             .rev()
             .fold(State::new(Action::Accept, None), |state, symbol| {
-                State::new(
-                    Action::MatchSymbol { symbol: *symbol },
-                    Some(Rc::new(state)),
-                )
+                State::new(Action::new(*symbol), Some(Rc::new(state)))
             });
 
         Ok(Self { start })
@@ -43,17 +40,29 @@ impl State {
 
     pub(crate) fn run(&self, input: &str) -> bool {
         match self.action {
-            Action::Accept => input.len() == 0,
+            Action::Accept => input.is_empty(),
             Action::MatchSymbol { symbol } => {
                 if input.starts_with(char::from(symbol)) && self.next.is_some() {
-                    self.next
-                        .clone()
-                        .unwrap_or_else(|| unreachable!("This is `Some`, it cannot be `None`..."))
-                        .run(input.get(1..).unwrap_or(""))
+                    self.success(input)
                 } else {
                     false
                 }
             }
+            Action::MatchAny => {
+                if input.is_empty() {
+                    false
+                } else {
+                    self.success(input)
+                }
+            }
+        }
+    }
+
+    fn success(&self, input: &str) -> bool {
+        if let Some(next) = self.next.clone() {
+            next.run(input.get(1..).unwrap_or(""))
+        } else {
+            false
         }
     }
 }
