@@ -5,11 +5,11 @@ use std::rc::Rc;
 
 use crate::{dfa::action::Action, error::Error};
 
-pub struct DFA {
+pub struct Dfa {
     start: State,
 }
 
-impl DFA {
+impl Dfa {
     #[allow(unused)]
     pub(crate) fn new(pattern: &Pattern) -> Result<Self, Error> {
         let start = pattern

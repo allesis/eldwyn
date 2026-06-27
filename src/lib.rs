@@ -1,5 +1,5 @@
 use crate::{
-    dfa::{DFA, Pattern},
+    dfa::{Dfa, Pattern},
     error::Error,
 };
 
@@ -7,7 +7,7 @@ mod dfa;
 mod error;
 
 pub struct Regex {
-    dfa: DFA,
+    dfa: Dfa,
 }
 
 pub trait IntoPattern {
@@ -32,7 +32,7 @@ impl Regex {
         T: IntoPattern,
     {
         let pattern: Pattern = p.into();
-        match DFA::new(&pattern) {
+        match Dfa::new(&pattern) {
             Ok(dfa) => Ok(Self { dfa }),
             Err(err) => Err(err),
         }
