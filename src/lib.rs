@@ -26,6 +26,12 @@ impl IntoPattern for &'static str {
     }
 }
 
+impl IntoPattern for String {
+    fn into(self) -> Pattern {
+        self.as_str().as_bytes().to_vec()
+    }
+}
+
 impl Regex {
     pub fn new<T>(p: T) -> Result<Self, Error>
     where

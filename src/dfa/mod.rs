@@ -2,8 +2,6 @@ mod action;
 
 pub(crate) type Pattern = Vec<u8>;
 
-use std::collections::binary_heap::Iter;
-
 use crate::{dfa::action::Action, error::Error};
 
 pub struct Dfa {
@@ -22,7 +20,8 @@ impl Dfa {
 
     #[allow(unused)]
     pub(crate) fn run(&self, input: &str) -> bool {
-        let z = self.states.iter().zip(input.into());
+        todo!()
+        //let z = self.states.iter().zip(input.into());
     }
 }
 
